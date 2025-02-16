@@ -9,7 +9,7 @@ import (
 )
 
 type Auth interface {
-	Login(ctx context.Context, email string, password string, appId int) (token string, err error)
+	Login(ctx context.Context, email string, password string, appId int64) (token string, err error)
 	Register(ctx context.Context, email string, password string) (userId int64, err error)
 	IsAdmin(ctx context.Context, userId int64) (isAdmin bool, err error)
 }
@@ -32,7 +32,7 @@ func (s *serverAPI) Login(ctx context.Context, req *ssov1.LoginRequest) (*ssov1.
 		return nil, err
 	}
 
-	token, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword(), int(req.GetAppId()))
+	token, err := s.auth.Login(ctx, req.GetEmail(), req.GetPassword(), int64(req.GetAppId()))
 	if err != nil {
 		return nil, status.Error(codes.Internal, "internal server error")
 	}
