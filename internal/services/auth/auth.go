@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/azonnix/sso/internal/domain/models"
 	. "github.com/azonnix/sso/internal/lib/jwt"
-	"github.com/azonnix/sso/internal/services/storage"
+	"github.com/azonnix/sso/internal/storage"
 	"golang.org/x/crypto/bcrypt"
 	"log/slog"
 	"time"
@@ -17,12 +17,12 @@ type UserSaver interface {
 }
 
 type UserProvider interface {
-	GetUser(ctx context.Context, email string) (models.User, error)
+	User(ctx context.Context, email string) (models.User, error)
 	IsAdmin(ctx context.Context, userId int64) (bool, error)
 }
 
 type AppProvider interface {
-	GetApp(ctx context.Context, appId int64) (models.App, error)
+	App(ctx context.Context, appId int64) (models.App, error)
 }
 
 var (
@@ -62,7 +62,7 @@ func (a *Auth) Login(ctx context.Context, email string, password string, appId i
 	log := a.log.With(slog.String("operation", op))
 	log.Info("logging user")
 
-	user, err := a.userProvider.GetUser(ctx, email)
+	user, err := a.userProvider.User(ctx, email)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
 			return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
@@ -75,7 +75,7 @@ func (a *Auth) Login(ctx context.Context, email string, password string, appId i
 		return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	app, err := a.appProvider.GetApp(ctx, appId)
+	app, err := a.appProvider.App(ctx, appId)
 	if err != nil {
 		if errors.Is(err, storage.ErrAppNotFound) {
 			return "", fmt.Errorf("%s: %w", op, ErrInvalidAppId)

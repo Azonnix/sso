@@ -1,0 +1,1 @@
+ALERT TABLE users DROP COLUMN is_admin;
