@@ -29,6 +29,7 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrUserExists         = errors.New("user already exists")
 	ErrInvalidAppId       = errors.New("invalid app id")
+	ErrUserNotFound       = errors.New("user not found")
 )
 
 type Auth struct {
@@ -126,7 +127,7 @@ func (a *Auth) IsAdmin(ctx context.Context, userId int64) (isAdmin bool, err err
 	isAdmin, err = a.userProvider.IsAdmin(ctx, userId)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
-			return false, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+			return false, fmt.Errorf("%s: %w", op, ErrUserNotFound)
 		}
 
 		return false, fmt.Errorf("%s: %w", op, err)
